@@ -6,13 +6,13 @@ import io.ktor.client.call.body
 import io.ktor.client.request.get
 
 interface CharacterRepository {
-    suspend fun getAllCharacters(): CharacterResponseModel
+    suspend fun getAllCharacters(currentPage: Int): CharacterResponseModel
 }
 
 class CharacterRepositoryImpl : CharacterRepository {
-    override suspend fun getAllCharacters(): CharacterResponseModel {
+    override suspend fun getAllCharacters(currentPage: Int): CharacterResponseModel {
         return HttpClientProvider.client
-            .get("character")
+            .get("character?page=$currentPage")
             .body()
     }
 }
