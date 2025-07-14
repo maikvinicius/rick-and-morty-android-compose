@@ -41,26 +41,22 @@ android {
 }
 
 dependencies {
-    val ktorVersion = "3.2.1"
-    val koinVersion = "4.1.0"
+    implementation(libs.androidx.junit.ktx)
+    implementation(libs.androidx.ui.test.junit4.android)
 
-    implementation("io.ktor:ktor-client-core:$ktorVersion")
-    implementation("io.ktor:ktor-client-okhttp:$ktorVersion")
-    implementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
-    implementation("io.ktor:ktor-serialization-kotlinx-json:$ktorVersion")
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.9.0")
+    implementation(libs.ktor.core)
+    implementation(libs.ktor.okhttp)
+    implementation(libs.ktor.content.negotiation)
+    implementation(libs.ktor.serialization)
 
-    implementation("androidx.compose.ui:ui:1.8.3")
-    implementation("androidx.compose.material3:material3:1.3.2")
+    implementation(libs.serialization.json)
 
-    implementation("io.coil-kt.coil3:coil-compose:3.2.0")
-    implementation("io.coil-kt.coil3:coil-network-okhttp:3.2.0")
-    implementation("com.squareup.okhttp3:logging-interceptor:5.1.0")
+    implementation(libs.coil.compose)
+    implementation(libs.coil.okhttp)
+    implementation(libs.okhttp.logging)
 
-    implementation("io.insert-koin:koin-androidx-compose:${koinVersion}")
-
-    implementation("androidx.navigation:navigation-compose:2.9.1")
-
+    implementation(libs.navigation.compose)
+    implementation(libs.koin.compose)
 
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.androidx.core.ktx)
@@ -72,10 +68,14 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     testImplementation(libs.junit)
+    testImplementation(libs.coroutines.test)
+    testImplementation(libs.mockk)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.ui.test.junit4)
+    androidTestImplementation(libs.androidx.espresso.core)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+    testImplementation(kotlin("test"))
 }
