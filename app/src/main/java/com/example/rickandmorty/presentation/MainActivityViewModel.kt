@@ -23,6 +23,7 @@ class MainActivityViewModel(
 
     init {
         _isLoading.value = true
+
         viewModelScope.launch {
             try {
                 val response = repository.getAllCharacters(currentPage = currentPage)
@@ -37,7 +38,9 @@ class MainActivityViewModel(
 
     fun loadMoreCharacters() {
         if (_isLoading.value || endReached) return
+
         _isLoading.value = true
+
         viewModelScope.launch {
             try {
                 val response = repository.getAllCharacters(currentPage = currentPage)
@@ -55,4 +58,23 @@ class MainActivityViewModel(
             }
         }
     }
+
+    fun searchCharacters(name: String) {
+        currentPage = 1
+        endReached = false
+        _isLoading.value = true
+
+        viewModelScope.launch {
+            try {
+                val response = repository.searchCharacters(name = name, currentPage = currentPage)
+                _state.value = response.results
+                currentPage++
+            } catch (e: Exception) {
+                e.printStackTrace()
+            } finally {
+                _isLoading.value = false
+            }
+        }
+    }
+
 }

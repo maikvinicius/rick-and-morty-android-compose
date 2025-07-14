@@ -24,12 +24,17 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -42,6 +47,9 @@ import com.example.rickandmorty.presentation.ui.theme.RickAndMortyTheme
 import coil3.compose.AsyncImage
 import com.example.rickandmorty.di.appModule
 import com.example.rickandmorty.domain.model.CharacterModel
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.distinctUntilChanged
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.androidx.compose.koinViewModel
@@ -74,35 +82,56 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+@OptIn(FlowPreview::class)
 @Composable
 fun RickAndMortyCharacterList() {
     val viewModel: MainActivityViewModel = koinViewModel()
     val characters by viewModel.state.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
     val listState = rememberLazyListState()
+    var query by rememberSaveable { mutableStateOf("") }
 
-    LaunchedEffect(listState) {
-        snapshotFlow {
-            val lastVisibleItemIndex = listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0
-            val totalItemsCount = listState.layoutInfo.totalItemsCount
-            lastVisibleItemIndex to totalItemsCount
-        }.collect { (lastVisible, total) ->
-            if (lastVisible >= total - 1 && !isLoading) {
-                viewModel.loadMoreCharacters()
+    LaunchedEffect(query) {
+        snapshotFlow { query }
+            .debounce(500)
+            .distinctUntilChanged()
+            .collect { name ->
+                viewModel.searchCharacters(name = name)
             }
-        }
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
-        LazyColumn(
-            state = listState,
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp)
-        ) {
-            items(characters) { character ->
-                CharacterCard(character = character)
-                Spacer(modifier = Modifier.height(16.dp))
+        Column(modifier = Modifier.fillMaxSize()) {
+            OutlinedTextField(
+                value = query,
+                onValueChange = { query = it },
+                label = { Text("Busque um personagem...") },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                colors = TextFieldDefaults.colors(
+                    focusedContainerColor = Color.Transparent,
+                    unfocusedContainerColor = Color.Transparent,
+                    focusedIndicatorColor = Color.LightGray,
+                    unfocusedIndicatorColor = Color.LightGray,
+                    cursorColor = Color.Gray,
+                    focusedLabelColor = Color.Gray,
+                    unfocusedLabelColor = Color.Gray,
+                    focusedTextColor = Color.Black,
+                    unfocusedTextColor = Color.Black,
+                ),
+                shape = RoundedCornerShape(12.dp)
+            )
+            LazyColumn(
+                state = listState,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 16.dp)
+            ) {
+                items(characters) { character ->
+                    CharacterCard(character = character)
+                    Spacer(modifier = Modifier.height(16.dp))
+                }
             }
         }
 
@@ -115,6 +144,18 @@ fun RickAndMortyCharacterList() {
                 contentAlignment = Alignment.Center
             ) {
                 CircularProgressIndicator(color = Color.White)
+            }
+        }
+    }
+
+    LaunchedEffect(listState) {
+        snapshotFlow {
+            val lastVisibleItemIndex = listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0
+            val totalItemsCount = listState.layoutInfo.totalItemsCount
+            lastVisibleItemIndex to totalItemsCount
+        }.collect { (lastVisible, total) ->
+            if (lastVisible >= total - 1 && !isLoading) {
+                viewModel.loadMoreCharacters()
             }
         }
     }
