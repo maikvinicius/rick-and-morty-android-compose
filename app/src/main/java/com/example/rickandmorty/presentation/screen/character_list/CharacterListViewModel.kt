@@ -1,15 +1,15 @@
-package com.example.rickandmorty.presentation
+package com.example.rickandmorty.presentation.screen.character_list
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.rickandmorty.domain.model.CharacterModel
-import kotlinx.coroutines.launch
 import com.example.rickandmorty.data.repository.CharacterRepository
+import com.example.rickandmorty.domain.model.CharacterModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 
-class MainActivityViewModel(
+class CharacterListViewModel(
     private val repository: CharacterRepository
 ) : ViewModel() {
     private val _state = MutableStateFlow<List<CharacterModel>>(emptyList())

@@ -59,6 +59,9 @@ dependencies {
 
     implementation("io.insert-koin:koin-androidx-compose:${koinVersion}")
 
+    implementation("androidx.navigation:navigation-compose:2.9.1")
+
+
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
